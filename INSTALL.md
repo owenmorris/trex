@@ -84,3 +84,71 @@ Point a domain name at it as well as a wildcard subdomain.  In these instruction
 
 In order to configure to configure to serve your own pages the worldoutline file bundled with Trex will need to be updated.
 
+Serving your own outlines
+=========================
+
+First, create an outline using Fargo or another outliner.  Make it accessible
+in a public location - either a dropbox public URL or hosted elsewhere that
+the trex server is able to connect to via http.
+
+To serve this outline using Trex you will need to edit the files bundled
+in the github repo that hold the Trex configuration details.  The following
+files will need to be edited under opml/ in the trex directory:
+
+* trexBoot.opml
+* trexWorldOutline.opml
+
+You will also need to create an outline to hold the user directory.  See the
+section called 'userDirectory.opml' below.
+
+These files will need to be accessible using http so you will need to install
+a webserver on your local machine and share out the files.  You can either
+copy the files or symlink them to the place you have installed trex.  However,
+if you do symlink you will need to ensure that your web server is configured 
+to follow symlinks - by default they won't as a security measure.  
+
+trexBoot.opml
+-------------
+
+Locate the line that contains the url of the world outline file under the trex 
+responder at the bottom of the file (or search for var opmlURL).  Modify the
+url to point to your copy of trexWorldOutline.opml - for example at
+http://localhost/trexWorldOutline.opml
+
+trexWorldOutline.opml
+---------------------
+
+Edit trexWorldOutline.opml and locate the headline titled 'userdirectory'.  It
+will be an opml include that points to the main smallpicture directory of
+named outlines.  Modify the url to the userDirectory.opml file you will 
+create in the next section. 
+
+userDirectory.opml
+------------------
+
+Create a new opml file called (by convention) userDirectory.opml.  Each 
+headline in the outline should have text that is the single word which
+will be included in the name of the outline eg. 'example'.  Edit the
+node attributes so that the headline is an include node with an url that 
+points to the public outline that is being served.  
+
+This can be done from a text editor or outliner.  If you want to use Fargo
+this can be done by creating a new outline and copying the file from 
+~/Dropbox/Apps/Fargo to the directory serving your files from the web server.
+
+Pointing Trex at your new config
+--------------------------------
+
+Run Trex and point it at your new trexBoot.opml.  For example, if you have
+shared all of the files out from the document root of your web server, run it
+as follows:
+
+    trex http://localhost/trexBoot.opml &
+
+Then use curl to test that the outline is being served properly (use the name
+that you set up in userDirectory.opml - here 'example' is used):
+
+    curl -H "Host: example" localhost:8080
+
+If things aren't set up properly you should get an error message from Trex.
+If not you should get html in the default format showing the rendered outline.
